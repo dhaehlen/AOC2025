@@ -92,13 +92,23 @@ static class Day1
                     throw new ArgumentException($"Invalid Rotation Direction in {line}");
                 }
 
+                // If we imagine the dial as an infinite number line starting at 0. We have
+                // 0 to 99 as the first century, 100 to 199 as the second century, etc. Every time we 
+                // cross or land on a century we would have crossed or landed on zero on the dial.
+                // We can also have negative centuries -1, -2, etc. The first would also start at 0
+                // and go to -99. This leaves us with a slighly awkard situation where zero is both
+                // the start of century 0 and the end of century -1.
+
+                //Initially we mapped negative centuries from -1 to -100. However that doesn't model the
+                //problem correctly because -1 is technically 99 on the dial not 0.
+
                 //Count Century Crossings (equivilant to crossing 0)
                 //> Have to watch out for negative values here
                 // -100------------0-----------100-----------200
                 //   |  Century -1 | Century 0  |  Century 1  |
                 // Century [0..99] = 0
-                // Century [-1..-100] = -1
-                int currentCentury = currentValue < 0 ? (currentValue + 1) / 100 - 1 : currentValue / 100;
+                // Century [0..-99] = -1
+                int currentCentury = currentValue < 0 ? (currentValue / 100) - 1 : currentValue / 100;
 
                 if (currentCentury != previousCentury)
                 {
