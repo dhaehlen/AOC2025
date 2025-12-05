@@ -1,6 +1,4 @@
 // DAY 1 Part 1 & 2
-using System.Security.Cryptography.X509Certificates;
-
 static class Day1
 {
     public static void Part1()
