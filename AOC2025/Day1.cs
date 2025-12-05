@@ -1,4 +1,5 @@
 // DAY 1 Part 1 & 2
+using System.Security.Cryptography.X509Certificates;
 
 static class Day1
 {
@@ -55,80 +56,108 @@ static class Day1
         Console.WriteLine($"The password is: {password}");
     }
     
-    public static void Part2()
+    public static int Part2(string path = "../../../Data/day1.txt")
     {
         int password = 0;
-        int currentValue = 50;
-        int previousCentury = 0;
+        int currentPosition = 50;
+        bool atZeroLast = false;
 
-        try
+        using StreamReader file = new(path);
+        string? line;
+        while ((line = file.ReadLine()) is not null)
         {
-            using StreamReader file = new("../../../Data/day1.txt");
-            string? line;
-            while ((line = file.ReadLine()) is not null)
+            //Test files have the answer marked with #
+            if(line[0]=='#'){continue;}
+
+            //Parse Line: We expect [L|R]###..
+            char rotationDirection = line[0];
+            bool success = int.TryParse(line[1..], out int rotationDistance);
+
+            if (!success) { throw new ArgumentException($"Could Not Parse Rotation Distance in {line}"); }
+
+            int lastPosition = currentPosition;
+
+            Console.WriteLine($"At {lastPosition}; Rotate {line}");
+
+            //Any rotation greater than +-99 will cross zero at least once
+            password += rotationDistance / 100;
+            int remainingDistance = rotationDistance % 100;
+
+            if(remainingDistance == 0)
             {
-                Console.WriteLine($"Current Value: {currentValue}");
+                Console.WriteLine($"Current Position: {currentPosition}; Password at: {password}"); 
+                continue; 
+            }
 
-                //Parse Line: We expect [L|R]###..
-                char rotationDirection = line[0];
-                bool success = int.TryParse(line[1..], out int rotationDistance);
+            //atZeroLast avoids double counting in cases where we
+            //are at zero and do multiples of full rotations.
+            if (atZeroLast)
+            {
+                if(rotationDirection == 'L'){ currentPosition = 100 - remainingDistance;}
+                if(rotationDirection == 'R'){ currentPosition = 0 + remainingDistance;}
+                Console.WriteLine($"Current Position: {currentPosition}; Password at: {password}");
+                atZeroLast = false;
+                continue;
+            }
 
-                if (!success) { throw new ArgumentException($"Could Not Parse Rotation Distance in {line}"); }
+            if (rotationDirection == 'L')
+            {
+                //L Subtract
+                currentPosition -= remainingDistance;
+            }
+            else if (rotationDirection == 'R')
+            {
+                //R Add
+                currentPosition += remainingDistance;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid Rotation Direction in {line}");
+            }
 
-                if (rotationDirection == 'L')
-                {
-                    //L Subtract
-                    Console.WriteLine($"Subtract: {rotationDistance}");
-                    currentValue -= rotationDistance;
-                }
-                else if (rotationDirection == 'R')
-                {
-                    //R Add
-                    Console.WriteLine($"Add: {rotationDistance}");
-                    currentValue += rotationDistance;
-                }
-                else
-                {
-                    throw new ArgumentException($"Invalid Rotation Direction in {line}");
-                }
+            if (currentPosition == 0 || currentPosition == 100)
+            {
+                password++;
+                currentPosition = 0;
+                atZeroLast = true;
+            }
+            else if (currentPosition < 0)
+            {
+                password++;
+                currentPosition += 100;
+                atZeroLast = false;
+            }
+            else if (currentPosition > 99)
+            {
+                password++;
+                currentPosition -= 100;
+                atZeroLast = false;
+            }
+            else if (currentPosition > 0 && currentPosition < 100)
+            {
+                atZeroLast = false;
+            }
+            Console.WriteLine($"Current Position: {currentPosition}; Password at: {password}");
+        }
+        Console.WriteLine($"The password is: {password}");
+        return password;
+    }
 
-                // If we imagine the dial as an infinite number line starting at 0. We have
-                // 0 to 99 as the first century, 100 to 199 as the second century, etc. Every time we 
-                // cross or land on a century we would have crossed or landed on zero on the dial.
-                // We can also have negative centuries -1, -2, etc. The first would also start at 0
-                // and go to -99. This leaves us with a slighly awkard situation where zero is both
-                // the start of century 0 and the end of century -1.
-
-                //Initially we mapped negative centuries from -1 to -100. However that doesn't model the
-                //problem correctly because -1 is technically 99 on the dial not 0.
-
-                //Count Century Crossings (equivilant to crossing 0)
-                //> Have to watch out for negative values here
-                // -100------------0-----------100-----------200
-                //   |  Century -1 | Century 0  |  Century 1  |
-                // Century [0..99] = 0
-                // Century [0..-99] = -1
-                int currentCentury = currentValue < 0 ? (currentValue / 100) - 1 : currentValue / 100;
-
-                if (currentCentury != previousCentury)
-                {
-                    Console.WriteLine($"Century Boundary Crossed: {previousCentury} -> {currentCentury}");
-                    password += Math.Abs(currentCentury - previousCentury);
-                    Console.WriteLine($"Password Incremented: {password}");
-                    previousCentury = currentCentury;
-                }
-                else if (currentCentury == previousCentury && currentValue % 100 == 0)
-                {
-                    password++;
-                    Console.WriteLine($"Landed on Current Century Boundary Password Incremented: {password}");
-                }
+    public static void Part2Test()
+    {
+        try
+        {            
+            foreach (string path in Directory.GetFiles("../../../TestData/day1"))
+            {
+                using StreamReader testFile = new(path);
+                _ = int.TryParse(testFile.ReadLine()![1..], out int answer);
+                int result = Part2(path);
+                Console.WriteLine($"{path}: Expected {answer}, Got {result}");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
         }
-
-        Console.WriteLine($"The password is: {password}");
     }
 }
