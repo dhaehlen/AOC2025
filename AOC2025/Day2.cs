@@ -1,7 +1,4 @@
 //Day 2 
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Text.RegularExpressions;
 
 static class Day2
 {
