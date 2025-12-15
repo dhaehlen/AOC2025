@@ -1,5 +1,4 @@
-using System.IO.Compression;
-
+//AoC Day 3
 public static class Day3
 {
     public static void Part1(string path = "../../../Data/day3.txt")
