@@ -6,4 +6,5 @@
 //Day3.Part2();//"../../../TestData/day3/day3test1.txt");
 //Day4.Part1();//"../../../TestData/day4/day4test1.txt"); 1373 too low
 //Day4.Part1Test();
-Day4.Part2();//"../../../TestData/day4/day4test1.txt");
+//Day4.Part2();//"../../../TestData/day4/day4test1.txt");
+Day5.Part1();//"../../../TestData/day5/day5test1.txt"); 692 too low;
