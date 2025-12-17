@@ -34,6 +34,8 @@ public static class Day5
     //each id to the first and last values to determine if its in the range.
     public static void Part1(string path="../../../Data/day5.txt")
     {
+        ranges.Clear();
+        IDs.Clear();
         ParseFile(path);
         //sorting doesn't provide much so skip
         //ranges.Sort((r1, r2) => r1.min.CompareTo(r2.min));
@@ -56,5 +58,37 @@ public static class Day5
             //Console.WriteLine($"{id} not in any range");
         }
         Console.WriteLine($"Fresh Products: {countOfFreshProducts}");
+    }
+
+    //Again enumerating the IDs feels like a bad idea becuase of the sheer
+    //number of them. Alternatively we can subtrace the max from the min 
+    //(being careful of the inclusive aspect) and add all the ranges. We will
+    //need to account for overlapping ranges.
+    public static void Part2(string path="../../../Data/day5.txt")
+    {
+        ranges.Clear();
+        IDs.Clear();
+        ParseFile(path);
+
+        ranges.Sort((r1, r2) => r1.min.CompareTo(r2.min));
+
+        nint totalIDs = 0;
+        nint currentMin = ranges[0].min;
+        nint currentMax = ranges[0].max;
+        for(int i = 0; i < ranges.Count; i++)
+        {
+            if(ranges[i].min > currentMax)
+            {
+                totalIDs += currentMax - currentMin + 1; //because inclusivity of range
+                currentMin = ranges[i].min;
+                currentMax = ranges[i].max; 
+            }
+            else
+            {
+                currentMax = ranges[i].max;
+            }
+        }
+        totalIDs += currentMax - currentMin + 1;
+        Console.WriteLine($"Total Fresh IDs: {totalIDs}");
     }
 }
