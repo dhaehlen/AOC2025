@@ -35,8 +35,7 @@ public static class Day5
     public static void Part1(string path="../../../Data/day5.txt")
     {
         ParseFile(path);
-        //for some reason sorting results in the wrong answer
-        //sorting also not really saving anything.
+        //sorting doesn't provide much so skip
         //ranges.Sort((r1, r2) => r1.min.CompareTo(r2.min));
 
         nint countOfFreshProducts = 0;
@@ -44,7 +43,7 @@ public static class Day5
         foreach(nint id in IDs)
         {
             int i = 0;
-            while(i < ranges.Count - 1)
+            while(i < ranges.Count)
             {
                 if(id >= ranges[i].min && id <= ranges[i].max)
                 {
