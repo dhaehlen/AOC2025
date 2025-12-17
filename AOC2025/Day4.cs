@@ -183,10 +183,6 @@ public static class Day4
     public static void Part1(string path="../../../Data/day4.txt")
     {
         List<string> layout = GetRollLayout(path);
-         
-        //get dimensions
-        int width = layout[0].Length;
-        int height = layout.Count;
 
         int accessibleRoleCount = 0;
 
@@ -223,38 +219,41 @@ public static class Day4
     public static void Part2(string path="../../../Data/day4.txt")
     {
         List<string> layout = GetRollLayout(path);
-        //get dimensions
-        int width = layout[0].Length;
-        int height = layout.Count;
         
         List<(int row, int col)> rollsToRemove = [];
         int accessibleRoleCount = 0;
-
-        var (coords, count) = CheckCorners(layout);
-        rollsToRemove.AddRange(coords);
-        accessibleRoleCount += count;
-        
-        var (_, _) = CheckTopEdge(layout);
-        rollsToRemove.AddRange(coords);
-        accessibleRoleCount += count;
-
-        var (_, _) = CheckBottomEdge(layout);
-        rollsToRemove.AddRange(coords);
-        accessibleRoleCount += count;
-
-        var (_, _) = CheckLeftEdge(layout);
-        rollsToRemove.AddRange(coords);
-        accessibleRoleCount += count;
-
-        var (_, _) = CheckRightEdge(layout);
-        rollsToRemove.AddRange(coords);
-        accessibleRoleCount += count;
+        int iterationRoleCount = 0;
 
         (List<(int row, int col)> coords, int count) result;
-        while((result = CheckCenter(layout)).count != 0)
+        do
         {
+            iterationRoleCount = 0;
+
+            result = CheckCorners(layout);
             rollsToRemove.AddRange(result.coords);
-            accessibleRoleCount += result.count;
+            iterationRoleCount += result.count;
+            
+            result = CheckTopEdge(layout);
+            rollsToRemove.AddRange(result.coords);
+            iterationRoleCount += result.count;
+
+            result = CheckBottomEdge(layout);
+            rollsToRemove.AddRange(result.coords);
+            iterationRoleCount += result.count;
+
+            result  = CheckLeftEdge(layout);
+            rollsToRemove.AddRange(result.coords);
+            iterationRoleCount += result.count;
+
+            result  = CheckRightEdge(layout);
+            rollsToRemove.AddRange(result.coords);
+            iterationRoleCount += result.count;
+
+            result = CheckCenter(layout);
+            rollsToRemove.AddRange(result.coords);
+            iterationRoleCount += result.count;
+
+            accessibleRoleCount += iterationRoleCount;
 
             //remove rolls
             //Note: better would be if we had a list of cols per row
@@ -262,8 +261,12 @@ public static class Day4
             {
                 char[] temp = layout[row].ToCharArray();
                 temp[col] = '.';
-                layout[row] = temp.ToString()!;
+                layout[row] = new string(temp);
             }
+            //Console.WriteLine(String.Join('\n', layout));
+            //Console.WriteLine();
         }
+        while(iterationRoleCount != 0);
+        Console.WriteLine($"Rolls Removed: {accessibleRoleCount}");
     }
 }
